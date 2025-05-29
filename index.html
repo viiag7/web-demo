@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Address Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Tema claro */
+        body.light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Tema escuro */
+        body.dark {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .ip-info {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title"></h1>
+    <div class="ip-info" id="ipv4"></div>
+    <div class="ip-info" id="ipv6"></div>
+
+    <script>
+        // Detecta o idioma do navegador
+        const userLang = navigator.language || navigator.userLanguage;
+
+        // Define os textos de acordo com o idioma
+        const translations = {
+            en: {
+                title: "Your IP Address",
+                ipv4: "Your IPv4 Address:",
+                ipv6: "Your IPv6 Address:"
+            },
+            es: {
+                title: "Tu dirección IP",
+                ipv4: "Tu dirección IPv4:",
+                ipv6: "Tu dirección IPv6:"
+            },
+            pt: {
+                title: "Seu endereço IP",
+                ipv4: "Seu endereço IPv4:",
+                ipv6: "Seu endereço IPv6:"
+            }
+        };
+
+        const lang = translations[userLang.split('-')[0]] || translations.en;
+
+        // Aplica os textos
+        document.getElementById('title').textContent = lang.title;
+
+        // Detecta o tema do sistema operacional
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.classList.add(prefersDarkMode ? 'dark' : 'light');
+
+        // Obtém os endereços IP usando uma API pública
+        async function fetchIP() {
+            try {
+                const response = await fetch('https://api64.ipify.org?format=json');
+                const dataIPv6 = await response.json();
+                document.getElementById('ipv6').textContent = `${lang.ipv6} ${dataIPv6.ip}`;
+
+                const responseIPv4 = await fetch('https://api.ipify.org?format=json');
+                const dataIPv4 = await responseIPv4.json();
+                document.getElementById('ipv4').textContent = `${lang.ipv4} ${dataIPv4.ip}`;
+            } catch (error) {
+                document.getElementById('ipv4').textContent = "Error fetching IPv4.";
+                document.getElementById('ipv6').textContent = "Error fetching IPv6.";
+            }
+        }
+
+        fetchIP();
+    </script>
+</body>
+</html>
